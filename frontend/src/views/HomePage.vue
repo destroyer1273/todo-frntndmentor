@@ -1,14 +1,37 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const userTodos = ref([
-  {text: 'Complete online Javascript course', completed: true},
-  {text: 'Jog around the park 3x', completed: false},
-  {text: '10 minutes meditation', completed: false},
-  {text: 'Read for 1 hour', completed: false},
-  {text: 'Pick up groceries', completed: false},
-  {text: 'Complete Todo App on Frontend Mentor', completed: false},
+  {id: 1, text: 'Complete online Javascript course', completed: true},
+  {id: 2, text: 'Jog around the park 3x', completed: false},
+  {id: 3, text: '10 minutes meditation', completed: false},
+  {id: 4, text: 'Read for 1 hour', completed: false},
+  {id: 5, text: 'Pick up groceries', completed: false},
+  {id: 6, text: 'Complete Todo App on Frontend Mentor', completed: false},
 ]);
+const newTodo = ref({});
+newTodo.value.completed = false;
+const addTodo = () => {
+    if(newTodo.value.text != "" && newTodo.value.text != undefined) {
+        userTodos.value.push({text: newTodo.value.text, completed: newTodo.value.completed});
+    }
+};
+const whatToDisplay = ref();
+const clearCompleted = () => {
+    userTodos.value = userTodos.value.filter(todo => !todo.completed);
+};
+const displayWhat = ref("All");
+watch(displayWhat, (newValue, oldValue) => {
+    console.log(newValue);
+});
+const activeStyle = {
+    color: '#2b3ff5',
+};
+const inactiveStyle = {
+    color: '#8b8b8b',
+};
+
+
 </script>
 
 <template>
@@ -19,24 +42,24 @@ const userTodos = ref([
             <h1>TODO</h1>
             <img src="/images/icon-sun.svg" alt="Солнышко">
           </div>
-          <form class="main__header__form">
-            <input type="radio" class="radio-input">
-            <input type="text" placeholder="Create a new todo..." class="text-input">
+          <form class="main__header__form" @submit.prevent="addTodo">
+            <input v-model="newTodo.completed" type="checkbox" class="radio-input">
+            <input v-model="newTodo.text" type="text" placeholder="Create a new todo..." class="text-input">
           </form>
         </div>
         <div class="main_bottom">
           <div v-for="item in userTodos" class="todo-item">
-            <input type="radio" class="todo-radio">
+            <input type="checkbox" class="todo-radio" :checked="item.completed" v-model="item.completed">
             <p>{{ item.text }}</p>
           </div>
           <div class="control-panel">
             <p class="indicator">{{ userTodos.length }} item(s) left</p>
             <div class="control-panel__toggle">
-              <a>All</a>
-              <a>Active</a>
-              <a>Completed</a>
+              <a class="control-toggle-a" @click="displayWhat = 'All'" :style="displayWhat === 'All' ? activeStyle : inactiveStyle">All</a>
+              <a class="control-toggle-a" @click="displayWhat = 'Active'" :style="displayWhat === 'Active' ? activeStyle : inactiveStyle">Active</a>
+              <a class="control-toggle-a" @click="displayWhat = 'Completed'" :style="displayWhat === 'Completed' ? activeStyle : inactiveStyle">Completed</a>
             </div>
-            <a class="clear">Clear completed</a>
+            <a class="clear" @click="clearCompleted">Clear completed</a>
           </div>
         </div>
     </div>
@@ -48,9 +71,21 @@ const userTodos = ref([
   color: #8b8b8b;
   font-size: 14px;
 }
+
+.control-toggle-a {
+    cursor: pointer;
+}
+.control-toggle-a:hover {
+    color: #FFF;
+}
 .clear {
   color: #8b8b8b;
   font-size: 14px;
+  transition: color 0.3s ease-in-out;
+  cursor: pointer;
+}
+.clear:hover {
+    color: #FFF;
 }
 .control-panel {
   background-color: #2e2c3a;
@@ -59,6 +94,7 @@ const userTodos = ref([
   padding: 16px 30px;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 0.5px 2px 0 #e0e0e0;
 }
 .control-panel__toggle a {
   margin-right: 10px;
@@ -104,10 +140,12 @@ const userTodos = ref([
   background-color: inherit;
   outline: none;
   border: none;
+  color: #fff;
 }
 .radio-input {
   appearance: none;
   position: relative;
+  cursor: pointer;
 }
 .radio-input::before {
   content: '';
@@ -119,12 +157,21 @@ const userTodos = ref([
   left: -45px;
   top: -16px;
 }
+.radio-input:checked::before {
+    content: "✓";
+    text-align: center;
+    color: #FFF;
+    background: linear-gradient(to bottom right, blue, pink);
+    border: none;
+    width: 21px;
+    height: 21px;
+}
 .todo-item  {
   display: flex;
   background-color: #2e2c3a;
   padding: 16px 40px;
   padding-left: 60px;
-  border: 0.1px solid #cacaca;
+  box-shadow: 0 0.5px 2px 0 #e0e0e0;
 }
 .todo-item p {
   color: #cacaca;
@@ -144,5 +191,14 @@ const userTodos = ref([
   border-radius: 80px;
   left: -45px;
   top: -1px;
+}
+.todo-radio:checked::before {
+    content: "✓";
+    text-align: center;
+    color: #FFF;
+    background: linear-gradient(to bottom right, blue, pink);
+    border: none;
+    width: 21px;
+    height: 21px;
 }
 </style>
