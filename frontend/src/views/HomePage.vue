@@ -1,5 +1,12 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
+
+const theme = ref('dark');
+
+const toggleTheme = () => {
+  theme.value = theme.value === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme.value);
+}
 
 const userTodos = ref([
   {id: 1, text: 'Complete online Javascript course', completed: true},
@@ -30,25 +37,36 @@ const activeStyle = {
 const inactiveStyle = {
     color: '#8b8b8b',
 };
-
-
+const lightthemeShadow = {
+  boxShadow: '0 0 38px 17px rgba(64, 64, 64, 0.3)',
+}
+const sortedTodos = computed(() => {
+  if(displayWhat.value === 'Active') {
+    return userTodos.value.filter(t => !t.completed);
+  }
+  if(displayWhat.value === 'Completed') {
+    return userTodos.value.filter(t => t.completed);
+  }
+  return userTodos.value;
+});
 </script>
 
 <template>
-  <div class="background">
+  <div class="background" :class="theme === 'dark' ? 'bgdarkimage' : 'bglightimage'">
     <div class="main">
         <div class="main__header">
           <div class="main__header__cont1">
             <h1>TODO</h1>
-            <img src="/images/icon-sun.svg" alt="Солнышко">
+            <img v-if="theme === 'dark'" src="/images/icon-sun.svg" alt="Солнышко" @click="toggleTheme">
+            <img v-else src="/images/icon-moon.svg" alt="Луна" @click="toggleTheme">
           </div>
           <form class="main__header__form" @submit.prevent="addTodo">
             <input v-model="newTodo.completed" type="checkbox" class="radio-input">
             <input v-model="newTodo.text" type="text" placeholder="Create a new todo..." class="text-input">
           </form>
         </div>
-        <div class="main_bottom">
-          <div v-for="item in userTodos" class="todo-item">
+        <div class="main_bottom" :style="theme === 'light' ? lightthemeShadow : null">
+          <div v-for="item in sortedTodos" class="todo-item">
             <input type="checkbox" class="todo-radio" :checked="item.completed" v-model="item.completed">
             <p>{{ item.text }}</p>
           </div>
@@ -67,6 +85,7 @@ const inactiveStyle = {
 </template>
 
 <style scoped>
+
 .indicator {
   color: #8b8b8b;
   font-size: 14px;
@@ -88,7 +107,7 @@ const inactiveStyle = {
     color: #FFF;
 }
 .control-panel {
-  background-color: #2e2c3a;
+  background-color: var(--bg-color2);
   display: flex;
   color: #FFF;
   padding: 16px 30px;
@@ -101,14 +120,20 @@ const inactiveStyle = {
   color: #a1a1a1;
   font-size: 17px;
 }
+.bgdarkimage {
+  background-image: url("/images/bg-desktop-dark.jpg");
+}
+.bglightimage {
+  background-image: url("/images/bg-desktop-light.jpg");
+}
 .background {
     width: 100%;
     height: 100%;
-    background-image: url("/images/bg-desktop-dark.jpg");
+    
     background-size: 100% auto;
     background-repeat: no-repeat;
     padding-top: 50px;
-    background-color: #000;
+    background-color: var(--bg-color1);
 }
 .main {
     max-width: 500px;
@@ -131,7 +156,7 @@ const inactiveStyle = {
   object-fit: contain;
 }
 .main__header__form {
-  background-color: #2e2c3a;
+  background-color: var(--bg-color2);
   padding: 16px 40px;
   padding-left: 60px;
   border-radius: 4px;
@@ -140,7 +165,7 @@ const inactiveStyle = {
   background-color: inherit;
   outline: none;
   border: none;
-  color: #fff;
+  color: var(--text-color);
 }
 .radio-input {
   appearance: none;
@@ -168,13 +193,13 @@ const inactiveStyle = {
 }
 .todo-item  {
   display: flex;
-  background-color: #2e2c3a;
+  background-color: var(--bg-color2);
   padding: 16px 40px;
   padding-left: 60px;
   box-shadow: 0 0.5px 2px 0 #e0e0e0;
 }
 .todo-item p {
-  color: #cacaca;
+  color: var(--text-color);
   font-weight: 400;
   font-size: 15px;
 }

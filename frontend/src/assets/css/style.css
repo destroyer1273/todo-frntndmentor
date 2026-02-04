@@ -19,3 +19,14 @@
 * {
   font-family: "Ubuntu";
 }
+:root { 
+  --bg-color1: #000;
+  --text-color: #cacaca;
+  --bg-color2: #2e2c3a;
+  --bg-image: "/images/bg-desktop-dark.jpg";
+}
+[data-theme="light"] {
+  --bg-color1: #FFF;
+  --text-color: #000;
+  --bg-color2: #FFF;
+}
